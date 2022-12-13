@@ -18,12 +18,14 @@ import numpy as np
 
 from datetime import datetime, timedelta, date, time
 
-print("Computation Start!!!!")
+from keras.applications.vgg16 import VGG16
 
-labels = ['bra', 'breast','iizuki', 'waist']
+
+labels = ['bra', 'breast','waist']
 img_size = 224
 def get_data(data_dir):
-    data = [] 
+    data = []
+    #labels = os.listdir(data_dir)
     for label in labels: 
         path = os.path.join(data_dir, label)
         class_num = labels.index(label)
@@ -38,11 +40,24 @@ def get_data(data_dir):
         
     return np.array(data)
 
+
+print("Computation Start!!!!")
 start_time = datetime.now()
 
+
 train = get_data('./Images')
-
-
+val = get_data('./Test')
+print("-------------")
+print("calculating time is")
+end_time = datetime.now()
+print(end_time - start_time)        
+print("                           ")
+print("===========================")
+print("Get Data Done!!")
+print("                           ")
+print("                           ")
+print("                           ")
+print("                           ")
 l = []
 for i in train:
     if(i[1] == 0):
@@ -63,6 +78,11 @@ sns.set_style('darkgrid')
 sns.countplot(l)
 
 
+
+
+
+
+
 plt.figure(figsize = (5,5))
 plt.imshow(train[1][0])
 plt.title(labels[train[0][1]])
@@ -71,28 +91,43 @@ plt.figure(figsize = (5,5))
 plt.imshow(train[-1][0])
 plt.title(labels[train[-1][1]])
 
+
+
+
+
+
+
 x_train = []
 y_train = []
-#x_val = []
-#y_val = []
+x_val = []
+y_val = []
 
 for feature, label in train:
   x_train.append(feature)
   y_train.append(label)
 
-#for feature, label in val:
-#  x_val.append(feature)
-#  y_val.append(label)
+for feature, label in val:
+  x_val.append(feature)
+  y_val.append(label)
 
 # Normalize the data
 x_train = np.array(x_train) / 255
-#x_val = np.array(x_val) / 255
+x_val = np.array(x_val) / 255
 
 x_train.reshape(-1, img_size, img_size, 1)
 y_train = np.array(y_train)
 
-#x_val.reshape(-1, img_size, img_size, 1)
-#y_val = np.array(y_val)
+x_val.reshape(-1, img_size, img_size, 1)
+y_val = np.array(y_val)
+
+print("                           ")
+print("===========================")
+print("Data Preprocessing Done!!")
+print("                           ")
+print("                           ")
+print("                           ")
+print("                           ")
+
 
 
 datagen = ImageDataGenerator(
@@ -110,6 +145,20 @@ datagen = ImageDataGenerator(
 
 datagen.fit(x_train)
 
+print("                           ")
+print("===========================")
+print("Data Augmentation Done!!!")
+print("                           ")
+print("                           ")
+print("                           ")
+print("                           ")
+import time
+while(1):
+    time.sleep(1)
+
+
+
+
 model = Sequential()
 model.add(Conv2D(32,3,padding="same", activation="relu", input_shape=(224,224,3)))
 model.add(MaxPool2D())
@@ -123,18 +172,89 @@ model.add(Dropout(0.4))
 
 model.add(Flatten())
 model.add(Dense(128,activation="relu"))
-model.add(Dense(2, activation="softmax"))
+model.add(Dense(3, activation="softmax"))
 
-model.summary()
 
-#history = model.fit(x_train,y_train,epochs = 500 , validation_data = (x_val, y_val))
+
+
+
+
+print("                           ")
+print("===========================")
+print("Define the Model Done!!")
+print("                           ")
+print("                           ")
+print("                           ")
+print("                           ")
+
+    
+
+
+
 
 
 opt = Adam(lr=0.000001)
 model.compile(optimizer = opt , loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True) , metrics = ['accuracy'])
+print("-------------")
+print("calculating time is")
+end_time = datetime.now()
+print(end_time - start_time)        
+print("                           ")
+print("===========================")
+print("Compile the Model Done!!")
+print("                           ")
+print("                           ")
+print("                           ")
+print("                           ")
 
 
 
+history = model.fit(x_train,y_train,epochs = 500 , validation_data = (x_val, y_val))
+model.save('Image.h5')  # creates a HDF5 file 'model.h5'
+print("-------------")
+print("calculating time is")
+end_time = datetime.now()
+print(end_time - start_time)
+print("                           ")
+print("===========================")
+print("Model Fit Done!!")
+print("                           ")
+print("                           ")
+print("                           ")
+print("                           ")
+
+
+
+
+
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+epochs_range = range(500)
+
+plt.figure(figsize=(15, 15))
+plt.subplot(2, 2, 1)
+plt.plot(epochs_range, acc, label='Training Accuracy')
+plt.plot(epochs_range, val_acc, label='Validation Accuracy')
+plt.legend(loc='lower right')
+plt.title('Training and Validation Accuracy')
+
+plt.subplot(2, 2, 2)
+plt.plot(epochs_range, loss, label='Training Loss')
+plt.plot(epochs_range, val_loss, label='Validation Loss')
+plt.legend(loc='upper right')
+plt.title('Training and Validation Loss')
+plt.show()
+
+print("                           ")
+print("===========================")
+print("Evaluating the result done!!!")
+print("                           ")
+print("                           ")
+print("                           ")
+print("                           ")
 
 
 print("Computation is Done!!!!")

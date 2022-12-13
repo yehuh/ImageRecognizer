@@ -8,21 +8,33 @@ Created on Fri Oct 28 22:37:23 2022
 import os
 
 # Absolute path of a file
-data_path = "./Images/waist/"
+data_path = "./Test/"
 
 
-labels = os.listdir(data_path)
+dirs = os.listdir(data_path)
+
+
+for label in dirs:
+    path = os.path.join(data_path, label)
+    #print(path)
+    imgs = os.listdir(path)
+    for img in imgs:
+        #print(img)
+        if "火狐截图" in img:
+            new_lab = img.replace("火狐截图","")
+            #print(new_lab)
+            new_path = os.path.join(path,new_lab)
+            #print(new_path)
+            old_path = os.path.join(path,img)
+            #print(old_path)
+            os.rename(old_path, new_path)
+        #path = os.path.join(path, img)
+        #imgs = os.listdir(path)
+        '''
+        for img in imgs:
+            
 
 '''
-for lab in labels:
-    if "火狐截图" in lab:
-        new_lab = lab.replace("火狐截图","")
-        #print(new_lab)
-        new_path = os.path.join(data_path,new_lab)
-        old_path = os.path.join(data_path,lab)
-        os.rename(old_path, new_path)
-'''
-
 #old_name = r"E:\demos\files\reports\details.txt"
 #new_name = r"E:\demos\files\reports\new_details.txt"
 
